@@ -14,3 +14,11 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user_name
+    
+
+class BulkUserUpload(models.Model):
+    file = models.FileField(upload_to='bulk_uploads/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Bulk upload at {self.uploaded_at}"

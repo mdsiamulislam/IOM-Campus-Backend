@@ -68,19 +68,19 @@ class SupportiveAuthView(APIView):
 
 
 class BulkUserView(APIView):
-    def get(self, request):
-        wb = load_workbook("/home/siam/Downloads/user.xlsx")
-
-        sheet = wb.active
-
-        users = []
-
+    def post(self, request):
+        file = request.FILES.get('file')
+        if not file:
+            return Response({"message": "No file uploaded."}, status=status.HTTP_400_BAD_REQUEST)
         
-        for row in sheet.iter_rows(min_row=2, values_only=True):
-            user_name, email, password, name, is_active, is_admin, bio = row
+        try:
+            wb = load_workbook(filename=file)
+            sheet = wb.active
 
-            users.append(
-                UserProfile(
+            created_users = []
+            for row in sheet.iter_rows(min_row=2, values_only=True):
+                user_name, email, password, name, is_active, is_admin, bio = row
+                user_profile = UserProfile(
                     user_name=user_name,
                     email=email,
                     password=password,
@@ -89,8 +89,10 @@ class BulkUserView(APIView):
                     is_admin=is_admin,
                     bio=bio
                 )
-            )
+                user_profile.save()
+                created_users.append(user_profile)
 
-        UserProfile.objects.bulk_create(users)
-
-        return Response(status = status.HTTP_200_OK)
+            serializer = UserProfileSerializer(created_users, many=True)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"message": f"Error processing file: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
