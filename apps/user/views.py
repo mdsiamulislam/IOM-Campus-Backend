@@ -3,6 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from openpyxl import load_workbook
+
+
 from .models import UserProfile
 from .serializer import UserProfileSerializer
 from apps.user import serializer
@@ -60,3 +63,34 @@ class SupportiveAuthView(APIView):
             serializer = UserProfileSerializer(profile)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response({"message": "Invalid email or password."}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+
+class BulkUserView(APIView):
+    def get(self, request):
+        wb = load_workbook("/home/siam/Downloads/user.xlsx")
+
+        sheet = wb.active
+
+        users = []
+
+        
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            user_name, email, password, name, is_active, is_admin, bio = row
+
+            users.append(
+                UserProfile(
+                    user_name=user_name,
+                    email=email,
+                    password=password,
+                    name=name,
+                    is_active=is_active,
+                    is_admin=is_admin,
+                    bio=bio
+                )
+            )
+
+        UserProfile.objects.bulk_create(users)
+
+        return Response(status = status.HTTP_200_OK)
