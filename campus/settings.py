@@ -12,12 +12,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-h48f#7ep%q4+=l=1%g3dz6c=yt$$kxks*v45^=p2!v$mzb@np*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "pedigreed-corine-gratefully.ngrok-free.dev",
+    "134.209.96.152",
 ]
 
 
@@ -123,3 +124,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'lecture_files')
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
